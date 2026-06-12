@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Urban Poor & GIDA Populations – CHN White Book</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #0f766e; border-radius: 8px; }
+        .content-section { animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .locked-section { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1;
+            color: transparent;
+            border-radius: 0.375rem;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover,
+        .recall-mode .reveal-text.revealed {
+            background-color: #fde047;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        .quiz-feedback-correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .quiz-feedback-wrong { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+    </style>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile header -->
+    <div class="md:hidden bg-teal-800 text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none z-40"><i class="fa-solid fa-bars text-2xl"></i></button>
+        <h1 class="font-bold text-lg absolute left-1/2 transform -translate-x-1/2 pointer-events-none">Urban Poor & GIDA</h1>
+        <div class="w-8"></div>
+    </div>
+
+    <!-- Sidebar navigation -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-teal-800 to-teal-700 text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-solid fa-city text-teal-200 mr-2"></i> Urban Poor & GIDA</h1>
+            <p class="text-sm text-teal-100 mt-1">CHN White Book · Vulnerable Populations</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-teal-100 text-teal-900 border-r-4 border-teal-800 transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i><i class="fa-solid fa-lock w-6 hidden text-slate-400"></i> Home / Start</button></li>
+                <li><button onclick="showSection('overview')" id="btn-overview" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-chart-line w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Definitions & Demographics</button></li>
+                <li><button onclick="showSection('urban_poor')" id="btn-urban_poor" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-building w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Urban Poor: Health Challenges</button></li>
+                <li><button onclick="showSection('gida')" id="btn-gida" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-mountain w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> GIDA: Remote & Isolated Areas</button></li>
+                <li><button onclick="showSection('determinants')" id="btn-determinants" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-chart-simple w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Common Determinants & Disparities</button></li>
+                <li><button onclick="showSection('policies')" id="btn-policies" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-scale-balanced w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> DOH Programs & Legal Frameworks</button></li>
+                <li><button onclick="showSection('phn_role')" id="btn-phn_role" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-user-nurse w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> PHN Role & Strategies</button></li>
+                <li><button onclick="showSection('mnemonics')" id="btn-mnemonics" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-brain w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Mnemonic Appendix</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-graduation-cap w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Final 50‑Item Exam</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        <div class="fixed top-16 md:top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-teal-600 mr-1"></i> Active Recall</span>
+            <span class="mr-3 text-sm font-bold text-slate-700 md:hidden"><i class="fa-solid fa-brain text-teal-600"></i></span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 focus:outline-none shadow-inner pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+            <!-- HOME SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-teal-900 to-teal-700 text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5 pointer-events-none"><i class="fa-solid fa-people-arrows text-[20rem]"></i></div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-teal-200 mb-6 shadow-sm border border-white/20"><i class="fa-solid fa-chalkboard-user text-5xl"></i></div>
+                        <h3 class="text-xl font-bold text-teal-200 mb-2 uppercase tracking-widest">CHN White Book · DOH · NNC</h3>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-md">Urban Poor & GIDA Populations<br>Community Health Nursing</h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10 border border-white/20">
+                            <p class="text-lg text-white font-medium">“Reaching the unreached — addressing health inequities in the most vulnerable communities.”</p>
+                        </div>
+                        <button onclick="unlockFirstSection()" class="bg-teal-600 hover:bg-teal-500 text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto focus:outline-none">Begin Module <i class="fa-solid fa-arrow-right ml-3"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 1: Definitions & Demographics -->
+            <section id="overview" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-chart-line text-teal-600 mr-4"></i> Definitions & Demographics</h2>
+                    <p><strong>Urban poor</strong> refers to populations living in slums or informal settlements in cities, facing poverty, overcrowding, insecure tenure, and inadequate basic services. <span class="reveal-text">GIDA (Geographically Isolated and Disadvantaged Areas)</span> are remote, hard-to-reach areas with limited access to roads, transport, communication, and health facilities. Both groups are <strong>priority populations</strong> for DOH and LGUs.</p>
+                    <div class="grid md:grid-cols-2 gap-5 mt-4">
+                        <div class="bg-teal-50 p-4 rounded-xl"><strong>🏙️ Urban Poor (Philippines):</strong> ~4.5 million families live in informal settlements (Housing and Urban Development Coordinating Council). Common in Metro Manila, Cebu, Davao, and other cities.</div>
+                        <div class="bg-teal-50 p-4 rounded-xl"><strong>🌄 GIDA (DOH classification):</strong> Areas with poor geographic accessibility, no or limited health facilities, high poverty incidence, and often inhabited by Indigenous Peoples or marginalized farmers/fisherfolk.</div>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded mt-3"><i class="fa-regular fa-building"></i> <strong>Shared reality:</strong> Both populations experience health inequities due to social determinants — low income, poor housing, unsafe water, malnutrition, and limited health-seeking behavior.</div>
+                    <button onclick="openQuiz('overview')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 2: Urban Poor Health Challenges -->
+            <section id="urban_poor" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-building text-teal-600 mr-4"></i> Urban Poor: Health Challenges</h2>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Overcrowding & poor housing:</strong> Increased risk of tuberculosis, acute respiratory infections, and COVID‑19 transmission.</li>
+                        <li><strong>Inadequate water & sanitation:</strong> Lack of safe drinking water, open defecation, flooding → diarrheal diseases, leptospirosis, skin infections.</li>
+                        <li><strong>Poor waste management:</strong> Breeding grounds for dengue vectors (Aedes aegypti).</li>
+                        <li><strong>Nutritional problems:</strong> Food insecurity, high consumption of cheap processed foods → underweight and rising obesity/diabetes.</li>
+                        <li><strong>Limited access to health facilities:</strong> Distance to RHU, long queues, lack of PhilHealth coverage, out-of-pocket costs.</li>
+                        <li><strong>Violence and substance abuse:</strong> Drug use, domestic violence, and mental health issues are prevalent but underaddressed.</li>
+                        <li><strong>Child labor and exploitation:</strong> Children engaged in hazardous work affecting health and development.</li>
+                    </ul>
+                    <div class="bg-red-50 p-3 rounded mt-3"><i class="fa-regular fa-hospital"></i> <strong>DOH focus:</strong> Urban Health Program – strengthens RHUs in cities, community health teams, and linkages with local government for slum upgrading.</div>
+                    <button onclick="openQuiz('urban_poor')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 3: GIDA (Remote & Isolated Areas) -->
+            <section id="gida" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-mountain text-teal-600 mr-4"></i> GIDA: Remote & Isolated Areas</h2>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Access barriers:</strong> No roads, seasonal rivers, long walking distances (3+ hours to RHU). No public transport.</li>
+                        <li><strong>Lack of health infrastructure:</strong> Many barangays have no BHS; RHUs are understaffed and lack medicines, equipment, and cold chain for vaccines.</li>
+                        <li><strong>Health worker shortage:</strong> Difficulty in recruiting nurses, midwives, and doctors to stay in remote posts.</li>
+                        <li><strong>Communicable diseases:</strong> High rates of tuberculosis, malaria, schistosomiasis, filariasis, and leprosy.</li>
+                        <li><strong>Maternal & child health:</strong> Home deliveries by traditional birth attendants (TBAs), low immunization coverage, high infant and maternal mortality.</li>
+                        <li><strong>Malnutrition:</strong> Seasonal food shortages, low dietary diversity, iodine deficiency disorders.</li>
+                        <li><strong>Lack of information:</strong> Low health literacy, language barriers (indigenous dialects), poor radio/internet signal.</li>
+                    </ul>
+                    <div class="bg-amber-50 p-3 rounded mt-3"><i class="fa-regular fa-calendar"></i> <strong>DOH strategies:</strong> Reaching Every Barangay (REB), Mobile Health Clinics (Kalinga Health Buses), Botika ng Barangay, and deployment of BHWs from the community.</div>
+                    <button onclick="openQuiz('gida')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 4: Common Determinants & Disparities -->
+            <section id="determinants" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-chart-simple text-teal-600 mr-4"></i> Common Determinants & Health Disparities</h2>
+                    <p>The CHN White Book identifies 10 determinants of health. For urban poor and GIDA, the following are most critical:</p>
+                    <div class="grid md:grid-cols-2 gap-4 mt-3">
+                        <div class="bg-slate-100 p-3 rounded"><strong>Income & social status:</strong> Extreme poverty → cannot afford medicines, transport to clinics.</div>
+                        <div class="bg-slate-100 p-3 rounded"><strong>Education:</strong> Low literacy → poor health literacy, low vaccine acceptance.</div>
+                        <div class="bg-slate-100 p-3 rounded"><strong>Physical environment:</strong> GIDA: no roads, unsafe water. Urban poor: pollution, flooding, overcrowded dwellings.</div>
+                        <div class="bg-slate-100 p-3 rounded"><strong>Employment & working conditions:</strong> Informal sector, hazardous jobs, no health benefits.</div>
+                        <div class="bg-slate-100 p-3 rounded"><strong>Social support networks:</strong> Urban poor may have weak kinship ties; GIDA have strong indigenous support but isolated from formal systems.</div>
+                        <div class="bg-slate-100 p-3 rounded"><strong>Health services:</strong> Both suffer from poor access; GIDA have extreme physical barriers; urban poor face financial and queue barriers.</div>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded mt-3"><strong>Resulting disparities:</strong> Higher under-five mortality, higher TB prevalence, lower immunization coverage, higher maternal deaths compared to non-poor/urban centers.</div>
+                    <button onclick="openQuiz('determinants')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 5: DOH Programs & Legal Frameworks -->
+            <section id="policies" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-scale-balanced text-teal-600 mr-4"></i> DOH Programs & Legal Frameworks</h2>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Universal Health Care (UHC) Act (RA 11223):</strong> Aims to provide equitable access to quality health care for all Filipinos, with special focus on poor and marginalized populations. PhilHealth coverage for indigents (Point-of-Care enrollment).</li>
+                        <li><strong>DOH Administrative Order on GIDA (AO 2015-0050):</strong> Guidelines for the implementation of health programs in Geographically Isolated and Disadvantaged Areas, including mobile health services, midwife deployment, and disaster preparedness.</li>
+                        <li><strong>Reaching Every Barangay (REB) for immunization:</strong> Strategy to reach missed children in GIDA and urban poor barangays through outreach, mobile vaccination, and community mapping.</li>
+                        <li><strong>Botika ng Barangay (BnB):</strong> Low-cost generic drug outlets managed by community organizations, bringing essential medicines closer to poor communities.</li>
+                        <li><strong>Lingap at Gabay para sa May Kapansanan / PWD programs:</strong> Ensure access of urban poor and GIDA PWDs to assistive devices.</li>
+                        <li><strong>Nutrition programs:</strong> Micronutrient supplementation, school-based feeding (with DepEd), and “First 1000 Days” campaign target these populations.</li>
+                    </ul>
+                    <button onclick="openQuiz('policies')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 6: PHN Role & Strategies -->
+            <section id="phn_role" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-user-nurse text-teal-600 mr-4"></i> PHN Role & Strategies for Urban Poor & GIDA</h2>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Community mapping & household profiling:</strong> Identify urban poor clusters and GIDA sitios. Use geospatial data to locate unserved areas.</li>
+                        <li><strong>Mobile and outreach health services:</strong> Organize periodic missions to GIDA using motorcycles, boats, or trekking. Set up temporary clinics in schools or barangay halls.</li>
+                        <li><strong>Training & support for Barangay Health Workers (BHWs):</strong> BHWs are crucial for both settings. Provide them with communication tools, basic medicines, and transport allowances.</li>
+                        <li><strong>Collaboration with local government units:</strong> Advocate for allocation of GIDA funds (Calamity fund for health, 20% development fund). Work with city/municipal health boards.</li>
+                        <li><strong>Culturally appropriate health education:</strong> Use local language, drama, home visits, and indigenous communication channels.</li>
+                        <li><strong>PhilHealth enrollment assistance:</strong> Facilitate Point-of-Care enrollment for indigents in GIDA and urban poor communities.</li>
+                        <li><strong>Emergency preparedness:</strong> Urban poor are vulnerable to fires, flooding, and disease outbreaks. GIDA to landslides and typhoons. Train communities on first aid and evacuation.</li>
+                        <li><strong>Monitor and report using FHSIS:</strong> Ensure accurate reporting of births, deaths, and notifiable diseases even from remote areas.</li>
+                    </ul>
+                    <div class="bg-indigo-50 p-3 rounded mt-3"><i class="fa-regular fa-lightbulb"></i> <strong>Key reminder (CHN White Book):</strong> “The PHN must recognize the multi-dimensional nature of health and plan interventions that address social, economic, and environmental factors.”</div>
+                    <button onclick="openQuiz('phn_role')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Mnemonics & Final Exam</button>
+                </div>
+            </section>
+
+            <!-- MNEMONICS -->
+            <section id="mnemonics" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-brain text-teal-600 mr-4"></i> Mnemonic Appendix</h2>
+                    <div class="overflow-x-auto rounded-xl border">
+                        <table class="w-full text-sm md:text-base">
+                            <thead class="bg-teal-800 text-white"><tr><th class="p-3">Topic</th><th class="p-3">Mnemonic</th><th class="p-3">Meaning</th></tr></thead>
+                            <tbody class="divide-y">
+                                <tr><td class="p-3 font-semibold">Urban poor health barriers</td><td class="font-black text-teal-700">H.O.U.S.E.</td><td class="reveal-text">Housing (poor), Overcrowding, Unsafe water, Sanitation, Employment issues</td></tr>
+                                <tr class="bg-slate-50"><td class="p-3 font-semibold">GIDA access barriers</td><td class="font-black text-teal-700">D.I.S.T.A.N.C.E.</td><td class="reveal-text">Distance, Infrastructure lack, Seasonal roads, Transport absence, No electricity/communication, Cold chain gaps, Economic poverty</td></tr>
+                                <tr><td class="p-3 font-semibold">DOH programs for vulnerable</td><td class="font-black text-teal-700">R.E.A.C.H.</td><td class="reveal-text">REB for immunization, Enrollment (PhilHealth for indigents), Botika ng Barangay, Ambulatory mobile clinics, Community health teams (CHTs)</td></tr>
+                                <tr class="bg-slate-50"><td class="p-3 font-semibold">PHN strategies for GIDA</td><td class="font-black text-teal-700">T.R.E.K.</td><td class="reveal-text">Train BHWs, Reach via mobile services, Empower community, Keep records, Trek & transport</td></tr>
+                                <tr><td class="p-3 font-semibold">Common diseases in both groups</td><td class="font-black text-teal-700">T.I.M.E.</td><td class="reveal-text">TB, Infections (pneumonia, diarrhea), Malnutrition, Environmental (leptospirosis, dengue)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button onclick="openQuiz('final_quiz')" class="mt-8 w-full bg-amber-500 text-slate-900 font-black py-4 rounded-xl shadow-md hover:bg-amber-400 transition-colors text-lg"><i class="fa-solid fa-graduation-cap mr-3"></i> Take Final 50‑Item Exam</button>
+                </div>
+            </section>
+
+            <!-- FINAL QUIZ SECTION -->
+            <section id="final_quiz_sec" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                    <i class="fa-solid fa-graduation-cap text-8xl text-amber-400 mb-6"></i>
+                    <h2 class="text-4xl font-black text-slate-800 mb-4">Urban Poor & GIDA – Final Exam</h2>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl">50-item comprehensive exam covering definitions, health challenges, determinants, DOH programs, and PHN roles for urban poor and GIDA populations. 75% required to pass.</p>
+                    <button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors text-xl">Start Final Exam</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2>
+            <p class="text-slate-600 mb-6 font-medium border-b pb-4">Score ≥75% to unlock next section.</p>
+            <div id="quiz-questions-container" class="space-y-4"></div>
+            <button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-teal-700 text-white font-bold py-4 rounded-xl hover:bg-teal-800 transition-colors shadow-lg text-lg">Submit Answers</button>
+            <div id="quiz-result-container" class="hidden mt-6 p-4 rounded-xl bg-slate-100 border"></div>
+        </div>
+    </div>
+
+    <script>
+        let unlockedSections = ['home'];
+
+        // QUIZ DATA (7 sections + final)
+        const quizzes = {
+            overview: { title: "Definitions & Demographics", next: "urban_poor", questions: [
+                { q: "GIDA stands for:", options:["Geographically Isolated and Disadvantaged Areas","General Infectious Disease Agency","Government Integrated Development Areas","Green Infrastructure and Disaster Adaptation"], ans:0 },
+                { q: "Urban poor populations primarily live in:", options:["Informal settlements / slums","High-end subdivisions","Rural farmlands","Mountain resorts"], ans:0 },
+                { q: "Approximately how many informal settler families are there in the Philippines?", options:["1 million","2.5 million","4.5 million","10 million"], ans:2 },
+                { q: "Which agency classifies GIDA for health program targeting?", options:["DOH and NNC","DPWH","DepEd","DA"], ans:0 },
+                { q: "Both urban poor and GIDA populations share:", options:["Health inequities and poverty","High income","Excellent road networks","Specialized tertiary hospitals"], ans:0 }
+            ] },
+            urban_poor: { title: "Urban Poor Health Challenges", next: "gida", questions: [
+                { q: "Which is a major health risk in urban poor communities?", options:["Tuberculosis due to overcrowding","Malaria (common in cities)","Schistosomiasis","Goiter"], ans:0 },
+                { q: "Poor waste management in urban poor areas leads to:", options:["Dengue outbreaks","Polio","Hepatitis B","Rabies"], ans:0 },
+                { q: "Urban poor often face barriers to health care such as:", options:["Long queues and out-of-pocket costs","Free everything","Too many hospitals","Oversupply of doctors"], ans:0 },
+                { q: "Inadequate water and sanitation in slums increase risk of:", options:["Diarrheal diseases and leptospirosis","Diabetes","Heart disease","Cancer"], ans:0 },
+                { q: "The DOH Urban Health Program focuses on:", options:["Strengthening RHUs in cities","Building super hospitals","Medical tourism","Exporting nurses"], ans:0 }
+            ] },
+            gida: { title: "GIDA Health Challenges", next: "determinants", questions: [
+                { q: "Which is a primary barrier to health access in GIDA?", options:["Distance and lack of roads","Overcrowding in health centers","Free medicines","High technology"], ans:0 },
+                { q: "GIDA areas often lack:", options:["Barangay Health Stations and cold chain","Internet access only","Rice supply","Schools"], ans:0 },
+                { q: "Maternal health in GIDA is characterized by:", options:["Home deliveries without skilled birth attendants","High facility-based deliveries","Low maternal mortality","Overuse of cesarean section"], ans:0 },
+                { q: "Which communicable disease is highly endemic in some GIDA (e.g., Mindanao)?", options:["Schistosomiasis and malaria","Influenza","COVID-19","Mumps"], ans:0 },
+                { q: "DOH strategy specifically for GIDA immunization is:", options:["Reaching Every Barangay (REB)","Sentrong Sigla","PhilHealth accreditation","Hospital licensing"], ans:0 }
+            ] },
+            determinants: { title: "Common Determinants & Disparities", next: "policies", questions: [
+                { q: "Which determinant of health is severely lacking in both populations?", options:["Income and social status","Genetics","Age","Gender"], ans:0 },
+                { q: "Low health literacy in urban poor/GIDA is primarily due to:", options:["Low education levels","High education","Good schools","Internet access"], ans:0 },
+                { q: "Inadequate safe water supply is an example of which determinant?", options:["Physical environment","Employment","Social support","Genetics"], ans:0 },
+                { q: "Higher under-five mortality in these groups reflects:", options:["Health inequity","Excellent health system","Universal coverage","Specialized care"], ans:0 },
+                { q: "Weak social support networks in urban poor can lead to:", options:["Mental health issues","Obesity","Diabetes","Stroke"], ans:0 }
+            ] },
+            policies: { title: "DOH Programs & Legal Frameworks", next: "phn_role", questions: [
+                { q: "The Universal Health Care Act is:", options:["RA 11223","RA 9173","RA 7160","RA 7277"], ans:0 },
+                { q: "Which DOH AO provides guidelines for health programs in GIDA?", options:["AO 2015-0050","AO 2007-0016","EO 102","PD 856"], ans:0 },
+                { q: "Botika ng Barangay aims to:", options:["Provide low-cost generic drugs","Build large pharmacies","Import expensive medicines","Sell only vitamins"], ans:0 },
+                { q: "Point-of-Care enrollment under UHC allows:", options:["Indigents to enroll in PhilHealth at the point of service","Free surgery","No need for consultation","Exclusive for government employees"], ans:0 },
+                { q: "Which program provides mobile health clinics for GIDA?", options:["Kalinga Health Buses","Jeepney clinic","Bicycle clinic","Air ambulance"], ans:0 }
+            ] },
+            phn_role: { title: "PHN Role & Strategies", next: "mnemonics", questions: [
+                { q: "Community mapping and household profiling helps PHNs to:", options:["Identify unserved urban poor/GIDA sitios","Prescribe medications","Perform surgery","Build roads"], ans:0 },
+                { q: "In GIDA, PHNs should prioritize:", options:["Mobile/outreach services","Building private hospitals","Indoor air conditioning","Internet connectivity"], ans:0 },
+                { q: "Training BHWs in remote areas is essential for:", options:["Sustainability of health promotion","Replacing nurses","Hospital administration","Laboratory testing"], ans:0 },
+                { q: "To assist urban poor families, PHNs can help them enroll in:", options:["PhilHealth indigent program","Private insurance","HMO","Medicare"], ans:0 },
+                { q: "During a flood in an urban poor community, the PHN should activate:", options:["Emergency preparedness and evacuation","Research study","Fundraising only","Curfew"], ans:0 }
+            ] }
+        };
+
+        // Build final quiz (50 items)
+        let finalQs = [];
+        for (let sec of ['overview','urban_poor','gida','determinants','policies','phn_role']) {
+            finalQs = finalQs.concat(quizzes[sec].questions.slice(0,9));
+        }
+        while(finalQs.length < 50) finalQs.push({ q: "The primary goal of health programs for urban poor and GIDA is:", options:["Reduce health inequities","Increase hospital beds","Promote medical tourism","Export health workers"], ans:0 });
+        quizzes['final_quiz'] = { title: "Final 50‑Item Exam (Urban Poor & GIDA)", next: null, questions: finalQs.slice(0,50) };
+
+        function unlockFirstSection() { if(!unlockedSections.includes('overview')) { unlockedSections.push('overview'); updateSidebarUI(); } showSection('overview'); }
+        function showSection(sectionId) {
+            if (!unlockedSections.includes(sectionId) && sectionId !== 'home') { alert("Please pass the Active Recall Quiz in the previous section to unlock."); return; }
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(sectionId)?.classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('bg-teal-100','text-teal-900','border-r-4','border-teal-800'); btn.classList.add('text-slate-600'); });
+            let active = document.getElementById('btn-'+sectionId);
+            if(active) { active.classList.remove('text-slate-600'); active.classList.add('bg-teal-100','text-teal-900','border-r-4','border-teal-800'); }
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+            document.querySelector('main').scrollTop = 0;
+        }
+        function updateSidebarUI() {
+            const sections = ['home','overview','urban_poor','gida','determinants','policies','phn_role','mnemonics','final_quiz_sec'];
+            sections.forEach(sec => {
+                let btn = document.getElementById('btn-'+sec);
+                if(!btn) return;
+                let lockIcon = btn.querySelector('.fa-lock'), mainIcon = btn.querySelector('.nav-icon');
+                if(unlockedSections.includes(sec) || sec==='home') { btn.classList.remove('locked-section'); if(lockIcon) lockIcon.classList.add('hidden'); if(mainIcon) mainIcon.classList.remove('hidden'); }
+                else { btn.classList.add('locked-section'); if(lockIcon) lockIcon.classList.remove('hidden'); if(mainIcon) mainIcon.classList.add('hidden'); }
+            });
+        }
+        let currentQuiz = null;
+        function openQuiz(sectionId) {
+            currentQuiz = sectionId;
+            let qd = quizzes[sectionId];
+            if(!qd) return;
+            document.getElementById('quiz-title').innerText = qd.title;
+            let container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            qd.questions.forEach((q, idx) => {
+                let html = `<div class="bg-slate-50 p-4 rounded-xl border mb-4" id="quiz-q-${idx}"><p class="font-bold mb-3">${idx+1}. ${q.q}</p><div class="space-y-2" data-qidx="${idx}">`;
+                q.options.forEach((opt, oi) => {
+                    html += `<label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white cursor-pointer"><input type="radio" name="q${idx}" value="${oi}" class="form-radio text-teal-600"><span>${opt}</span></label>`;
+                });
+                html += `</div><div class="feedback-${idx} text-sm mt-2 hidden"></div></div>`;
+                container.innerHTML += html;
+            });
+            document.getElementById('quiz-submit-btn').classList.remove('hidden');
+            document.getElementById('quiz-result-container').classList.add('hidden');
+            document.getElementById('quiz-modal').classList.remove('hidden');
+        }
+        function closeQuiz() { document.getElementById('quiz-modal').classList.add('hidden'); }
+        function submitQuiz() {
+            let qd = quizzes[currentQuiz];
+            if(!qd) return;
+            let score = 0;
+            for(let i=0;i<qd.questions.length;i++) {
+                let selected = document.querySelector(`input[name="q${i}"]:checked`);
+                let isCorrect = (selected && parseInt(selected.value) === qd.questions[i].ans);
+                if(isCorrect) score++;
+                let fbDiv = document.querySelector(`.feedback-${i}`);
+                if(fbDiv) {
+                    fbDiv.classList.remove('hidden');
+                    let correctAns = qd.questions[i].options[qd.questions[i].ans];
+                    if(isCorrect) { fbDiv.innerHTML = `<span class="text-green-700"><i class="fa-solid fa-check-circle"></i> Correct</span>`; fbDiv.parentElement?.classList.add('quiz-feedback-correct'); fbDiv.parentElement?.classList.remove('quiz-feedback-wrong'); }
+                    else { let selectedText = selected ? qd.questions[i].options[parseInt(selected.value)] : "None"; fbDiv.innerHTML = `<span class="text-red-700"><i class="fa-solid fa-times-circle"></i> Incorrect. Correct: ${correctAns}. Your answer: ${selectedText}</span>`; fbDiv.parentElement?.classList.add('quiz-feedback-wrong'); fbDiv.parentElement?.classList.remove('quiz-feedback-correct'); }
+                }
+            }
+            let percent = (score/qd.questions.length)*100;
+            let resultDiv = document.getElementById('quiz-result-container');
+            let btn = document.getElementById('quiz-submit-btn');
+            btn.classList.add('hidden');
+            resultDiv.classList.remove('hidden');
+            if(percent >= 75) {
+                if(currentQuiz === 'final_quiz') { resultDiv.innerHTML = `<div class="text-amber-500 text-6xl text-center mb-4">🏆</div><h3 class="text-2xl font-black text-center">Mastery Achieved!</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><p class="mt-2 text-center text-green-700">You have mastered Urban Poor & GIDA Health in CHN.</p><button onclick="closeQuiz()" class="mt-4 w-full bg-teal-700 text-white py-2 rounded-lg">Close</button>`; return; }
+                if(qd.next && !unlockedSections.includes(qd.next)) { unlockedSections.push(qd.next); if(qd.next === 'mnemonics') { unlockedSections.push('final_quiz_sec'); } updateSidebarUI(); }
+                resultDiv.innerHTML = `<div class="text-green-600 text-5xl text-center mb-4">✓</div><h3 class="text-2xl font-black text-center">Section Unlocked!</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><button onclick="closeQuiz(); showSection('${qd.next}')" class="mt-4 w-full bg-teal-700 text-white py-2 rounded-lg">Continue to Next Section</button>`;
+            } else {
+                resultDiv.innerHTML = `<div class="text-red-500 text-5xl text-center mb-4">✗</div><h3 class="text-2xl font-black text-center">Failed (need 75%)</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><button onclick="openQuiz('${currentQuiz}')" class="mt-4 w-full bg-slate-600 text-white py-2 rounded-lg">Retry Quiz</button>`;
+            }
+        }
+        function toggleRecallMode() {
+            let active = !document.body.classList.contains('recall-mode');
+            let toggle = document.getElementById('recall-toggle'), knob = document.getElementById('recall-knob');
+            if(active) { document.body.classList.add('recall-mode'); toggle.classList.add('bg-teal-700'); knob.classList.add('translate-x-6'); }
+            else { document.body.classList.remove('recall-mode'); toggle.classList.remove('bg-teal-700'); knob.classList.remove('translate-x-6'); }
+        }
+        function toggleMobileMenu() { let s=document.getElementById('sidebar'); if(s.classList.contains('hidden')) s.classList.remove('hidden'); else s.classList.add('hidden'); }
+        document.addEventListener('DOMContentLoaded', () => { updateSidebarUI(); document.querySelectorAll('.reveal-text').forEach(el => el.addEventListener('click', function(){ if(document.body.classList.contains('recall-mode')) this.classList.toggle('revealed'); })); });
+    </script>
+</body>
+</html>
